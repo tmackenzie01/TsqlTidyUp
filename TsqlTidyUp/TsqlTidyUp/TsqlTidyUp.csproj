@@ -43,8 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FieldBase.cs" />
+    <Compile Include="FieldElement.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FieldTitle.cs" />
+    <Compile Include="RowHeading.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
