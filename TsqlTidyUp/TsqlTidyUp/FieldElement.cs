@@ -10,7 +10,6 @@ namespace TsqlTidyUp
     {
         public FieldElement(String row)
         {
-
         }
     }
 }
