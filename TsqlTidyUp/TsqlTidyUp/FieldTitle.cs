@@ -26,7 +26,29 @@ namespace TsqlTidyUp
             }
             else
             {
-                m_headingRows = new List<String>() { title };
+                m_headingRows = new List<String>();
+                int previousChar = 0;
+                // See if we can split the heading on camelCase, only try it if the string is above a certain length
+                if (title.Length > 6)
+                {
+                    for (int i = 1; i < title.Length; i++)
+                    {
+                        if (Char.IsUpper(title, i))
+                        {
+                            m_headingRows.Add(title.Substring(previousChar, i - previousChar));
+                            previousChar = i;
+                        }
+                    }
+
+                    m_headingRows.Add(title.Substring(previousChar, title.Length - previousChar));
+                }
+
+                if (m_headingRows.Count == 0)
+                {
+                    // No camelCase
+                    m_headingRows.Add(title);
+                }
+
                 CalculateRowWidth();
             }
         }
