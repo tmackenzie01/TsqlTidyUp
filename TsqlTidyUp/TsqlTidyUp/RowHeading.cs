@@ -16,61 +16,110 @@ namespace TsqlTidyUp
 
         public String FitToWidth(int fitWidth)
         {
-            List<int> titleLengths = new List<int>();
-            bool fitSuccess = false;
-
-            // Loop until we fit the length
-            bool fitsLine = false;
-            bool firstRun = true;
-            bool fullySplit = false;
-            int rows = 0;
-
-            while ((!fitsLine) || (fullySplit))
+            // Get the current width of all the headings
+            int currentWidth = 0;
+            int displayIndex = 0;
+            foreach (FieldTitle field in m_fields)
             {
-                int titleLengthTotal = 0;
-                FieldTitle fieldToSplit = new FieldTitle("");
-                fullySplit = true;
+                currentWidth = currentWidth + field.RowWidth + 3;
 
-                foreach (FieldTitle field in m_fields)
+                // Set the display index here as my creation for m_fields was far too clever for me to fit in a second parameter for display index
+                field.DisplayIndex = displayIndex++;
+            }
+
+            // Final divider
+            currentWidth = currentWidth + 1;
+
+            // Stage 1 - Separate
+            FieldTitle selectedHeading = null;
+            m_fields.Sort(new RowWidthComparer());
+            for (int i = 0; i < m_fields.Count; i++)
+            {
+                if (currentWidth > fitWidth)
                 {
-                    titleLengths.Add(field.RowWidth);
-                    titleLengthTotal = titleLengthTotal + field.RowWidth + 3;
-
-                    if (field.Rows > rows)
+                    selectedHeading = m_fields[i];
+                    if (selectedHeading.CanSeparate)
                     {
-                        rows = field.Rows;
+                        currentWidth = currentWidth - selectedHeading.RowWidth;
+                        selectedHeading.Separate();
+                        currentWidth = currentWidth + selectedHeading.RowWidth;
                     }
+                }
+            }
 
-                    if (field.RowWidth > fieldToSplit.RowWidth)
+            StringBuilder result1 = new StringBuilder("STAGE 1\r\n");
+            result1.AppendLine(new String('-', fitWidth));
+            ConstructRow(result1);
+            Debug.WriteLine(result1.ToString());
+
+            // Stage 2 - Split headings not separated
+            m_fields.Sort(new RowWidthComparer());
+            for (int j = 0; j < m_fields.Count; j++)
+            {
+                if (currentWidth > fitWidth)
+                {
+                    selectedHeading = m_fields[j];
+                    if ((selectedHeading.CanSplit) && (!selectedHeading.CanSeparate))
                     {
-                        if (field.CanSplit)
+                        currentWidth = currentWidth - selectedHeading.RowWidth;
+                        selectedHeading.Split();
+                        currentWidth = currentWidth + selectedHeading.RowWidth;
+                    }
+                }
+            }
+
+            StringBuilder result2 = new StringBuilder("STAGE 2\r\n");
+            ConstructRow(result2);
+            Debug.WriteLine(result2.ToString());
+
+            // Stage 3 - Split any
+            m_fields.Sort(new RowWidthComparer());
+            bool fullySplit = false;
+
+            while ((currentWidth > fitWidth) && (!fullySplit))
+            {
+                fullySplit = true;
+                for (int k = 0; k < m_fields.Count; k++)
+                {
+                    if (currentWidth > fitWidth)
+                    {
+                        selectedHeading = m_fields[k];
+                        if (selectedHeading.CanSplit)
                         {
-                            fieldToSplit = field;
+                            currentWidth = currentWidth - selectedHeading.RowWidth;
+                            selectedHeading.Split();
+                            currentWidth = currentWidth + selectedHeading.RowWidth;
                         }
                     }
 
-                    // If we've split everything to the max then we'll exit the loop
-                    fullySplit = fullySplit && !field.CanSplit;
+                    fullySplit = fullySplit && !selectedHeading.CanSplit;
                 }
-                
-                int diff = titleLengthTotal - fitWidth;
-                fitsLine = (diff < 0);
-
-                // After the first run we have shortened all the titles with underscores "title_and_this"
-                // so we have to split the largest title until it all fits
-                if (!firstRun)
-                {                    
-                    fieldToSplit.Split();
-                }
-
-                firstRun = false;
             }
 
-            // Now format then together
-            StringBuilder result = new StringBuilder();
+            m_fields.Sort(new RowWidthComparer());
+            StringBuilder result3 = new StringBuilder("STAGE 3\r\n");
+            ConstructRow(result3);
+            ConstructUnderlineRow(result3);
+            Debug.WriteLine(result3.ToString());
 
-            // The headings
-            for (int row = 0; row < rows; row++)
+            return result3.ToString();
+
+        }
+
+        private void ConstructRow(StringBuilder result)
+        {
+            m_fields.Sort(new DisplayIndexComparer());
+
+            int maxRows = 0;
+            foreach (FieldTitle title in m_fields)
+            {
+                if (title.Rows > maxRows)
+                {
+                    maxRows = title.Rows;
+                }
+            }
+
+            for (int row = 0; row < maxRows; row++)
             {
                 result.Append($" {m_fields[0].GetRow(row)} |");
                 for (int i = 1; i < m_fields.Count; i++)
@@ -78,25 +127,17 @@ namespace TsqlTidyUp
                     result.Append($" {m_fields[i].GetRow(row)} |");
                 }
                 result.AppendLine();
-
-                fitSuccess = (result.Length != fitWidth);
             }
+        }
 
-            // Underlines
+        private void ConstructUnderlineRow(StringBuilder result)
+        {
             result.Append($"-{ new String('-', m_fields[0].RowWidth)}-|");
             for (int i = 1; i < m_fields.Count; i++)
             {
                 result.Append($"-{ new String('-', m_fields[i].RowWidth)}-|");
             }
             result.AppendLine();
-
-            if (fitSuccess)
-            {
-                Debug.WriteLine($"*** Could meet specified width of {fitWidth}");
-            }
-
-            return result.ToString();
-
         }
 
         List<FieldTitle> m_fields;

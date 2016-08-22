@@ -18,20 +18,30 @@ namespace TsqlTidyUp
             String originalField = this.ToString();
             int rowCount = Rows + 1;
 
-            m_headingRows = new List<String>();
+            List<String> newHeadingRows = new List<String>();
             int splitLength = originalField.Length / rowCount;
 
             if (splitLength > 1)
             {
                 for (int i = 0; i < (rowCount - 1); i++)
                 {
-                    m_headingRows.Add(originalField.Substring(0, splitLength));
+                    newHeadingRows.Add(originalField.Substring(0, splitLength));
                     originalField = originalField.Substring(splitLength, originalField.Length - splitLength);
                 }
             }
 
-            m_headingRows.Add(originalField);
-            CalculateRowWidth();
+            newHeadingRows.Add(originalField);
+            int newRowWidth = newHeadingRows.OrderByDescending(s => s.Length).First().Length;
+
+            if (newRowWidth < m_rowWidth)
+            {
+                m_headingRows = newHeadingRows;
+                CalculateRowWidth();
+            }
+            else
+            {
+                m_splitLimitReached = true;
+            }
         }
 
         protected void CalculateRowWidth()
@@ -39,11 +49,19 @@ namespace TsqlTidyUp
             m_rowWidth = m_headingRows.OrderByDescending(s => s.Length).First().Length;
         }
 
+        public bool CanSeparate
+        {
+            get
+            {
+                return m_containsSeparator;
+            }
+        }
+
         public bool CanSplit
         {
             get
             {
-                return (m_rowWidth > 3);
+                return ((m_rowWidth > 3) && !m_splitLimitReached);
             }
         }
 
@@ -63,6 +81,18 @@ namespace TsqlTidyUp
             }
         }
 
+        public int DisplayIndex
+        {
+            get
+            {
+                return m_displayIndex;
+            }
+            set
+            {
+                m_displayIndex = value;
+            }
+        }
+
         public override string ToString()
         {
             return m_headingRows.Aggregate((a, b) => (a + b));
@@ -70,5 +100,8 @@ namespace TsqlTidyUp
 
         protected List<String> m_headingRows;
         protected int m_rowWidth;
+        protected bool m_containsSeparator;
+        bool m_splitLimitReached;
+        int m_displayIndex;
     }
 }

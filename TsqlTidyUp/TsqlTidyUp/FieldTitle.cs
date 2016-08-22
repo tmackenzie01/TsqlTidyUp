@@ -10,6 +10,40 @@ namespace TsqlTidyUp
     {
         public FieldTitle(String title)
         {
+            m_headingRows = new List<String>();
+            m_headingRows.Add(title);
+            CalculateRowWidth();
+
+            if (title.Contains("_"))
+            {
+                m_containsSeparator = true;
+            }
+            else
+            {
+                // See if we can split the heading on camelCase, only try it if the string is above a certain length
+                if (title.Length > 6)
+                {
+                    for (int i = 1; i < title.Length; i++)
+                    {
+                        if (Char.IsUpper(title, i))
+                        {
+                            m_containsSeparator = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void Separate()
+        {
+            // When we call separate rows will only ever have one row
+            if (m_headingRows.Count != 1)
+            {
+                throw new Exception("Too many rows");
+            }
+
+            String title = m_headingRows[0];
             if (title.Contains("_"))
             {
                 m_headingRows = new List<String>();
@@ -59,7 +93,7 @@ namespace TsqlTidyUp
             {
                 return m_headingRows[i].PadRight(m_rowWidth);
             }
-            else if (i < (m_headingRows.Count -1))
+            else if (i < (m_headingRows.Count - 1))
             {
                 return $"{m_headingRows[i]}".PadRight(m_rowWidth);
             }
