@@ -30,7 +30,7 @@ namespace TsqlTidyUp
                     // Split 1st row (titles), second row (underlines)
                     RowHeading headingRow = new RowHeading(tsqlText[0]);
                     List<RowData> rows = new List<RowData>();
-                    result.Append(headingRow.FitToWidth(powershellWidth));
+                    headingRow.FitToWidth(powershellWidth);
 
                     List<int> originalWidths = tsqlText[1].Split(' ').Select(s => s.Length).ToList<int>();
                     for (int i = 2; i < tsqlText.Length; i++)
@@ -47,6 +47,14 @@ namespace TsqlTidyUp
                         }
                     }
 
+                    // Headings and underlines
+                    result.AppendLine(new String('-', powershellWidth));
+                    headingRow.ConstructRow(result);
+                    headingRow.ConstructUnderlineRow(result);
+
+                    StringBuilder result3 = new StringBuilder("");
+
+                    // Data
                     foreach (RowData eachRow in rows)
                     {
                         eachRow.ConstructRow(result);

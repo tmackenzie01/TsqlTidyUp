@@ -14,7 +14,7 @@ namespace TsqlTidyUp
             m_fields = row.Split(new char[0], StringSplitOptions.RemoveEmptyEntries).ToList<String>().Select(s => new FieldTitle(s)).ToList<FieldTitle>();
         }
 
-        public String FitToWidth(int fitWidth)
+        public void FitToWidth(int fitWidth)
         {
             // Get the current width of all the headings
             int currentWidth = 0;
@@ -44,6 +44,7 @@ namespace TsqlTidyUp
                 }
             }
 
+            //m_fields.Sort(new RowWidthComparer());
             //StringBuilder result1 = new StringBuilder("STAGE 1\r\n");
             //ConstructRow(result1);
             //Debug.WriteLine(result1.ToString());
@@ -64,6 +65,7 @@ namespace TsqlTidyUp
                 }
             }
 
+            //m_fields.Sort(new RowWidthComparer());
             //StringBuilder result2 = new StringBuilder("STAGE 2\r\n");
             //ConstructRow(result2);
             //Debug.WriteLine(result2.ToString());
@@ -92,20 +94,17 @@ namespace TsqlTidyUp
                 }
             }
 
-            m_fields.Sort(new RowWidthComparer());
+            //m_fields.Sort(new RowWidthComparer());
             //StringBuilder result3 = new StringBuilder("STAGE 3\r\n");
-            StringBuilder result3 = new StringBuilder("");
-            result3.AppendLine(new String('-', fitWidth));
-            ConstructRow(result3);
-            ConstructUnderlineRow(result3);
-
-            return result3.ToString();
+            //ConstructRow(result3);
+            //Debug.WriteLine(result3.ToString());
+            
+            // Important make sure everything is sorted back to display order
+            m_fields.Sort(new DisplayIndexComparer());
         }
 
-        private void ConstructRow(StringBuilder result)
+        public void ConstructRow(StringBuilder result)
         {
-            m_fields.Sort(new DisplayIndexComparer());
-
             int maxRows = 0;
             foreach (FieldTitle title in m_fields)
             {
@@ -126,7 +125,7 @@ namespace TsqlTidyUp
             }
         }
 
-        private void ConstructUnderlineRow(StringBuilder result)
+        public void ConstructUnderlineRow(StringBuilder result)
         {
             result.Append($"-{ new String('-', m_fields[0].RowWidth)}-|");
             for (int i = 1; i < m_fields.Count; i++)
