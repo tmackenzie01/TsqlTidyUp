@@ -44,9 +44,9 @@ namespace TsqlTidyUp
                 }
             }
 
-            StringBuilder result1 = new StringBuilder("STAGE 1\r\n");
-            ConstructRow(result1);
-            Debug.WriteLine(result1.ToString());
+            //StringBuilder result1 = new StringBuilder("STAGE 1\r\n");
+            //ConstructRow(result1);
+            //Debug.WriteLine(result1.ToString());
 
             // Stage 2 - Split headings not separated
             m_fields.Sort(new RowWidthComparer());
@@ -64,9 +64,9 @@ namespace TsqlTidyUp
                 }
             }
 
-            StringBuilder result2 = new StringBuilder("STAGE 2\r\n");
-            ConstructRow(result2);
-            Debug.WriteLine(result2.ToString());
+            //StringBuilder result2 = new StringBuilder("STAGE 2\r\n");
+            //ConstructRow(result2);
+            //Debug.WriteLine(result2.ToString());
 
             // Stage 3 - Split any
             m_fields.Sort(new RowWidthComparer());
@@ -93,11 +93,11 @@ namespace TsqlTidyUp
             }
 
             m_fields.Sort(new RowWidthComparer());
-            StringBuilder result3 = new StringBuilder("STAGE 3\r\n");
+            //StringBuilder result3 = new StringBuilder("STAGE 3\r\n");
+            StringBuilder result3 = new StringBuilder("");
             result3.AppendLine(new String('-', fitWidth));
             ConstructRow(result3);
             ConstructUnderlineRow(result3);
-            Debug.WriteLine(result3.ToString());
 
             return result3.ToString();
         }
@@ -134,6 +134,11 @@ namespace TsqlTidyUp
                 result.Append($"-{ new String('-', m_fields[i].RowWidth)}-|");
             }
             result.AppendLine();
+        }
+
+        public List<int> RowWidths()
+        {
+            return m_fields.Select(s => s.RowWidth).ToList<int>();
         }
 
         List<FieldTitle> m_fields;

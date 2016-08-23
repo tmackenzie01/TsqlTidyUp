@@ -93,6 +93,16 @@ namespace TsqlTidyUp
             }
         }
 
+        public String GetRow(int i)
+        {
+            if (i <= (m_headingRows.Count - 1))
+            {
+                return m_headingRows[i].PadRight(m_rowWidth);
+            }
+
+            return "".PadRight(m_rowWidth);
+        }
+
         public override string ToString()
         {
             return m_headingRows.Aggregate((a, b) => (a + b));

@@ -20,10 +20,6 @@ namespace TsqlTidyUp
             {
                 int powershellWidth = 119;
 
-                // TODO This is a guide - remove if when complete
-                Debug.WriteLine(new String('-', powershellWidth));
-                Console.WriteLine(new String('-', powershellWidth));
-                
                 String filename = args[0];
                 String[] tsqlText = File.ReadAllLines(filename);
                 StringBuilder result = new StringBuilder();
@@ -33,7 +29,28 @@ namespace TsqlTidyUp
                 {
                     // Split 1st row (titles), second row (underlines)
                     RowHeading headingRow = new RowHeading(tsqlText[0]);
-                    result.AppendLine(headingRow.FitToWidth(powershellWidth));
+                    List<RowData> rows = new List<RowData>();
+                    result.Append(headingRow.FitToWidth(powershellWidth));
+
+                    List<int> originalWidths = tsqlText[1].Split(' ').Select(s => s.Length).ToList<int>();
+                    for (int i = 2; i < tsqlText.Length; i++)
+                    {
+                        // Don't parse empty rows or the bottom (X rows affected) line
+                        if (!String.IsNullOrEmpty(tsqlText[i]))
+                        {
+                            if (!tsqlText[i].Contains("rows affected"))
+                            {
+                                // Get the first row of data and get the minimum width of each data element (we pass in the heading widths as a guide)
+                                RowData data = new RowData(tsqlText[i], originalWidths, headingRow.RowWidths());
+                                rows.Add(data);
+                            }
+                        }
+                    }
+
+                    foreach (RowData eachRow in rows)
+                    {
+                        eachRow.ConstructRow(result);
+                    }
                 }
 
                 Console.WriteLine(result.ToString());

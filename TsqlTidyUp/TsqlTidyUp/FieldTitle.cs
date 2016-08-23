@@ -86,19 +86,5 @@ namespace TsqlTidyUp
                 CalculateRowWidth();
             }
         }
-
-        public String GetRow(int i)
-        {
-            if (i == (m_headingRows.Count - 1))
-            {
-                return m_headingRows[i].PadRight(m_rowWidth);
-            }
-            else if (i < (m_headingRows.Count - 1))
-            {
-                return $"{m_headingRows[i]}".PadRight(m_rowWidth);
-            }
-
-            return "".PadRight(m_rowWidth);
-        }
     }
 }
