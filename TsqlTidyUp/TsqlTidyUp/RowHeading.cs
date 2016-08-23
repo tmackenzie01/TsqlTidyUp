@@ -27,9 +27,6 @@ namespace TsqlTidyUp
                 field.DisplayIndex = displayIndex++;
             }
 
-            // Final divider
-            currentWidth = currentWidth + 1;
-
             // Stage 1 - Separate
             FieldTitle selectedHeading = null;
             m_fields.Sort(new RowWidthComparer());
@@ -48,7 +45,6 @@ namespace TsqlTidyUp
             }
 
             StringBuilder result1 = new StringBuilder("STAGE 1\r\n");
-            result1.AppendLine(new String('-', fitWidth));
             ConstructRow(result1);
             Debug.WriteLine(result1.ToString());
 
@@ -98,12 +94,12 @@ namespace TsqlTidyUp
 
             m_fields.Sort(new RowWidthComparer());
             StringBuilder result3 = new StringBuilder("STAGE 3\r\n");
+            result3.AppendLine(new String('-', fitWidth));
             ConstructRow(result3);
             ConstructUnderlineRow(result3);
             Debug.WriteLine(result3.ToString());
 
             return result3.ToString();
-
         }
 
         private void ConstructRow(StringBuilder result)
