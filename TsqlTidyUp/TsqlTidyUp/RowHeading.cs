@@ -44,10 +44,7 @@ namespace TsqlTidyUp
                 }
             }
 
-            //m_fields.Sort(new RowWidthComparer());
-            //StringBuilder result1 = new StringBuilder("STAGE 1\r\n");
-            //ConstructRow(result1);
-            //Debug.WriteLine(result1.ToString());
+            //DebugRowDisplay("STAGE 1\r\n");
 
             // Stage 2 - Split headings not separated
             m_fields.Sort(new RowWidthComparer());
@@ -65,10 +62,7 @@ namespace TsqlTidyUp
                 }
             }
 
-            //m_fields.Sort(new RowWidthComparer());
-            //StringBuilder result2 = new StringBuilder("STAGE 2\r\n");
-            //ConstructRow(result2);
-            //Debug.WriteLine(result2.ToString());
+            //DebugRowDisplay("STAGE 2\r\n");
 
             // Stage 3 - Split any
             m_fields.Sort(new RowWidthComparer());
@@ -94,13 +88,18 @@ namespace TsqlTidyUp
                 }
             }
 
-            //m_fields.Sort(new RowWidthComparer());
-            //StringBuilder result3 = new StringBuilder("STAGE 3\r\n");
-            //ConstructRow(result3);
-            //Debug.WriteLine(result3.ToString());
-            
+            //DebugRowDisplay("STAGE 3\r\n");
+
             // Important make sure everything is sorted back to display order
             m_fields.Sort(new DisplayIndexComparer());
+        }
+
+        private void DebugRowDisplay(String debugHeading)
+        {
+            m_fields.Sort(new RowWidthComparer());
+            StringBuilder debugText = new StringBuilder(debugHeading);
+            ConstructRow(debugText);
+            Debug.WriteLine(debugText.ToString());
         }
 
         public void ConstructRow(StringBuilder result)
