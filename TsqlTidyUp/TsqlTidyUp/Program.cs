@@ -42,10 +42,15 @@ namespace TsqlTidyUp
                             {
                                 // Get the first row of data and get the minimum width of each data element (we pass in the heading widths as a guide)
                                 RowData data = new RowData(tsqlText[i], originalWidths);
-                                data.FitToHeadingWidths(headingRow.RowWidths());
                                 rows.Add(data);
                             }
                         }
+                    }
+
+                    // Fit each row to the headings widths
+                    foreach(RowData newDataRow in rows)
+                    {
+                        newDataRow.FitToHeadingWidths(headingRow.RowWidths());
                     }
 
                     // Headings and underlines
