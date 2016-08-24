@@ -94,6 +94,11 @@ namespace TsqlTidyUp
             m_fields.Sort(new DisplayIndexComparer());
         }
 
+        public void IncreaseRowWidth(int index, int widthIncrease)
+        {
+            m_fields[index].IncreaseRowWidth(widthIncrease);
+        }
+
         private void DebugRowDisplay(String debugHeading)
         {
             m_fields.Sort(new RowWidthComparer());
@@ -137,6 +142,20 @@ namespace TsqlTidyUp
         public List<int> RowWidths()
         {
             return m_fields.Select(s => s.RowWidth).ToList<int>();
+        }
+
+        public int FullRowWidth
+        {
+            get
+            {
+                int fullWidth = 0;
+                foreach (FieldTitle field in m_fields)
+                {
+                    fullWidth = fullWidth + field.RowWidth + 3;
+                }
+
+                return fullWidth;
+            }
         }
 
         List<FieldTitle> m_fields;

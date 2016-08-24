@@ -49,6 +49,16 @@ namespace TsqlTidyUp
             m_rowWidth = m_headingRows.OrderByDescending(s => s.Length).First().Length;
         }
 
+        public void IncreaseRowWidth(int widthIncrease)
+        {
+            // Just need to increase each row by the same
+            for (int i =0; i < m_headingRows.Count; i++)
+            {
+                m_headingRows[i] = m_headingRows[i] + new String(' ', widthIncrease);
+            }
+            CalculateRowWidth();
+        }
+
         public bool CanSeparate
         {
             get

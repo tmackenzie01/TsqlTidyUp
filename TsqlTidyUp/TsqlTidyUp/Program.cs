@@ -71,6 +71,27 @@ namespace TsqlTidyUp
                         }
                     }
 
+                    int fullRowWidth = headingRow.FullRowWidth;
+                    if (fullRowWidth < powershellWidth)
+                    {
+                        int index = 0;
+                        while ((fullRowWidth + widthIncreases[index]) < powershellWidth)
+                        {
+                            headingRow.IncreaseRowWidth(index, widthIncreases[index]);
+
+                            fullRowWidth = headingRow.FullRowWidth;
+                            index++;
+
+                            if (index >= widthIncreases.Length)
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    // Re-calculate the heading row widths
+                    currentHeadingWidths = headingRow.RowWidths();
+
                     // Fit each row to the headings widths
                     foreach (RowData newDataRow in rows)
                     {
@@ -85,6 +106,7 @@ namespace TsqlTidyUp
                     StringBuilder result3 = new StringBuilder("");
 
                     // Data
+                    int count = 0;
                     foreach (RowData eachRow in rows)
                     {
                         eachRow.ConstructRow(result);
