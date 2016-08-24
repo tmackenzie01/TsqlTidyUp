@@ -59,6 +59,11 @@ namespace TsqlTidyUp
             }
         }
 
+        public List<int> RowWidths()
+        {
+            return m_fields.Select(s => s.RowWidth).ToList<int>();
+        }
+
         List<FieldData> m_fields;
     }
 }

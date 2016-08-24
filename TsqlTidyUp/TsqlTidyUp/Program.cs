@@ -47,10 +47,34 @@ namespace TsqlTidyUp
                         }
                     }
 
-                    // Fit each row to the headings widths
-                    foreach(RowData newDataRow in rows)
+                    // Look at each row and determine which fields require larger widths
+                    List<int> currentHeadingWidths = headingRow.RowWidths();
+                    int[] widthIncreases = new int[currentHeadingWidths.Count];
+                    foreach (RowData eachRow in rows)
                     {
-                        newDataRow.FitToHeadingWidths(headingRow.RowWidths());
+                        List<int> eachRowWidths = eachRow.RowWidths();
+                        for (int j = 0; j < eachRowWidths.Count; j++)
+                        {
+                            int adjustedWidth = currentHeadingWidths[j] + widthIncreases[j];
+                            if (eachRowWidths[j] > adjustedWidth)
+                            {
+                                widthIncreases[j] = eachRowWidths[j] - currentHeadingWidths[j];
+                            }
+                        }
+                    }
+
+                    for (int k = 0; k < widthIncreases.Length; k++)
+                    {
+                        if (widthIncreases[k] > 0)
+                        {
+                            Debug.WriteLine($"Field {k + 1} requires {widthIncreases[k]} extra characters");
+                        }
+                    }
+
+                    // Fit each row to the headings widths
+                    foreach (RowData newDataRow in rows)
+                    {
+                        newDataRow.FitToHeadingWidths(currentHeadingWidths);
                     }
 
                     // Headings and underlines
