@@ -9,7 +9,7 @@ namespace TsqlTidyUp
 {
     public class RowData
     {
-        public RowData(String rowData, List<int> headingWidths, List<int> newWidths)
+        public RowData(String rowData, List<int> headingWidths)
         {
             m_fields = new List<FieldData>();
             int total = 0;
@@ -32,16 +32,16 @@ namespace TsqlTidyUp
 
                 // Trim starting and trailing spaces (text fields seem to be left adjusted, number values to the right)
                 textData = textData.TrimStart(' ').TrimEnd(' ');
-                if (textData.Length > newWidths[i])
-                {
-                    textData = textData.Substring(0, newWidths[i]);
-                }
-                else
-                {
-                    textData = textData.PadRight(newWidths[i]);
-                }
                 m_fields.Add(new FieldData(textData));
                 start = start + headingWidths[i] + 1;
+            }
+        }
+
+        public void FitToHeadingWidths(List<int> newWidths)
+        {
+            for (int i = 0; i < m_fields.Count; i++)
+            {
+                m_fields[i].Truncate(newWidths[i]);
             }
         }
 

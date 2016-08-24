@@ -41,7 +41,8 @@ namespace TsqlTidyUp
                             if (!tsqlText[i].Contains("rows affected"))
                             {
                                 // Get the first row of data and get the minimum width of each data element (we pass in the heading widths as a guide)
-                                RowData data = new RowData(tsqlText[i], originalWidths, headingRow.RowWidths());
+                                RowData data = new RowData(tsqlText[i], originalWidths);
+                                data.FitToHeadingWidths(headingRow.RowWidths());
                                 rows.Add(data);
                             }
                         }
