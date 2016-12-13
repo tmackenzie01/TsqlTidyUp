@@ -23,9 +23,20 @@ namespace TsqlTidyUp
                 String filename = args[0];
                 String[] tsqlText = File.ReadAllLines(filename);
                 StringBuilder result = new StringBuilder();
+                bool errorsFound = false;
+
+                if (tsqlText[0].StartsWith("Msg 4060"))
+                {
+                    errorsFound = true;
+                }
+
+                if (tsqlText[0].StartsWith("Sqlcmd: Error"))
+                {
+                    errorsFound = true;
+                }
 
                 // Get the title lengths
-                if (tsqlText.Length >= 2)
+                if ((tsqlText.Length >= 2) && !errorsFound)
                 {
                     // Split 1st row (titles), second row (underlines)
                     RowHeading headingRow = new RowHeading(tsqlText[0]);
@@ -106,15 +117,21 @@ namespace TsqlTidyUp
                     StringBuilder result3 = new StringBuilder("");
 
                     // Data
-                    int count = 0;
                     foreach (RowData eachRow in rows)
                     {
                         eachRow.ConstructRow(result);
                     }
                 }
 
-                Console.WriteLine(result.ToString());
-                Debug.WriteLine(result.ToString());
+                if (!errorsFound)
+                {
+                    Console.WriteLine(result.ToString());
+                    Debug.WriteLine(result.ToString());
+                }
+                else
+                {
+                    Console.WriteLine(File.ReadAllText(filename));
+                }
             }
         }
     }
