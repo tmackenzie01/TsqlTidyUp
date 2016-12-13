@@ -25,14 +25,22 @@ namespace TsqlTidyUp
                 StringBuilder result = new StringBuilder();
                 bool errorsFound = false;
 
-                if (tsqlText[0].StartsWith("Msg 4060"))
+                if (tsqlText != null)
                 {
-                    errorsFound = true;
-                }
+                    if (tsqlText.Length > 0)
+                    {
+                        {
+                            if (tsqlText[0].StartsWith("Msg 4060"))
+                            {
+                                errorsFound = true;
+                            }
 
-                if (tsqlText[0].StartsWith("Sqlcmd: Error"))
-                {
-                    errorsFound = true;
+                            if (tsqlText[0].StartsWith("Sqlcmd: Error"))
+                            {
+                                errorsFound = true;
+                            }
+                        }
+                    }
                 }
 
                 // Get the title lengths
